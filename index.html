@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Good Brief | Get Unique Design Briefs - Creative Brief Generator</title>
+  <meta name="description" content="Generate unique, realistic design briefs for logos, websites, apps, and branding. Practice your design skills with real-world client briefs.">
+  <meta name="keywords" content="design brief generator, creative brief, design practice, logo brief, web design brief, goodbrief clone">
+  <meta name="author" content="MoMo">
+  
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- jsPDF and html2canvas CDNs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-serif, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .theme-transition {
+      transition: background-color 0.3s ease, border-color 0.3s ease, text-color 0.3s ease, fill 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Grid background patterns */
+    .grid-bg {
+      background-image: linear-gradient(to right, rgba(139, 92, 246, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .dark .grid-bg {
+      background-image: linear-gradient(to right, rgba(139, 92, 246, 0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(139, 92, 246, 0.02) 1px, transparent 1px);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #2D2D2D;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E5E7EB;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9CA3AF;
+    }
+  </style>
+
+  <script>
+    // Initialize dark mode instantly to avoid white flashbang layouts
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+</head>
+<body class="bg-[#FFFFFF] text-[#000000] dark:bg-[#121212] dark:text-[#FFFFFF] min-h-screen flex flex-col antialiased selection:bg-purple-200 dark:selection:bg-purple-950/50 grid-bg relative">
+
+  <!-- PREMIUM AMBIENT GLOW COMPONENT -->
+  <div class="absolute top-[-100px] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] pointer-events-none -z-10 overflow-hidden">
+    <div class="absolute top-0 left-1/4 w-[350px] h-[350px] bg-blue-400/10 dark:bg-blue-600/5 rounded-full blur-[100px]"></div>
+    <div class="absolute top-10 right-1/4 w-[350px] h-[350px] bg-purple-400/10 dark:bg-purple-600/5 rounded-full blur-[100px]"></div>
+  </div>
+
+  <!-- NAVIGATION HEADER CONTAINER -->
+  <header class="w-full max-w-6xl mx-auto px-4 pt-5 pb-2 flex justify-between items-center z-10">
+    <div class="flex items-center gap-2 select-none">
+      <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white font-black text-sm shadow-xs">G</div>
+      <span class="font-bold text-sm tracking-tight text-gray-400 dark:text-neutral-500 font-mono">v3.0 Enhanced</span>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Brief History Quick Dropdown Selector -->
+      <div id="history-wrapper" class="relative hidden sm:block">
+        <button id="history-toggle-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 transition cursor-pointer text-gray-600 dark:text-neutral-400 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
+          <span>Recent Briefs</span>
+        </button>
+        <!-- History Menu Popover Dropdown -->
+        <div id="history-dropdown" class="absolute right-0 mt-2 w-72 bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-xl shadow-xl hidden z-50 p-2 text-left">
+          <div class="px-2.5 py-1.5 text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider border-b border-gray-100 dark:border-neutral-800 mb-1">Session History</div>
+          <div id="history-items-list" class="space-y-0.5 max-h-60 overflow-y-auto">
+            <!-- Dynamic list items populate here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Dark Mode Switch Button Toggle -->
+      <button id="theme-toggle" aria-label="Toggle dark mode" class="p-2 rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-2xs hover:bg-gray-50 dark:hover:bg-neutral-800 transition cursor-pointer text-gray-700 dark:text-gray-300">
+        <svg id="theme-toggle-sun" class="hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        <svg id="theme-toggle-moon" class="hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER CONTAINER -->
+  <main class="flex-1 w-full max-w-3xl mx-auto px-4 py-6 text-center flex flex-col justify-start items-center">
+    
+    <!-- BRAND AND SUBTITLE HERO -->
+    <h1 class="text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-r from-neutral-900 via-purple-700 to-blue-600 dark:from-white dark:via-purple-400 dark:to-blue-400 bg-clip-text text-transparent mb-3 select-none">
+      Good Brief
+    </h1>
+    <p class="text-gray-500 dark:text-neutral-400 font-medium text-sm md:text-base max-w-xl mx-auto mb-6">
+      Get Unique Design Briefs &middot; Creative Brief Generator
+    </p>
+
+    <!-- LIVE STATS BADGE PILL -->
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-400 font-bold text-xs shadow-3xs mb-8 select-none">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 block animate-ping"></span>
+      <span>Over <span id="stats-counter" class="font-mono">11,492,804</span> design briefs generated!</span>
+    </div>
+
+    <!-- SELECTION FILTERS WRAPPER -->
+    <div class="w-full bg-white/60 dark:bg-neutral-900/40 border border-gray-100 dark:border-neutral-800/60 p-4 md:p-5 rounded-2xl shadow-xs backdrop-blur-md mb-6 text-left">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- CONTROL 1: JOB TYPE -->
+        <div class="flex flex-col gap-1.5">
+          <label for="brief-type" class="text-[10px] font-extrabold text-gray-400 dark:text-neutral-500 uppercase tracking-widest px-1">Job Type</label>
+          <div class="relative">
+            <select id="brief-type" class="w-full appearance-none px-3.5 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-gray-900 dark:text-white font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:border-transparent transition cursor-pointer text-sm shadow-2xs">
+              <!-- JS Injected Options -->
+            </select>
+            <div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-gray-400 dark:text-neutral-500">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTROL 2: INDUSTRY -->
+        <div class="flex flex-col gap-1.5">
+          <label for="brief-industry" class="text-[10px] font-extrabold text-gray-400 dark:text-neutral-500 uppercase tracking-widest px-1">Industry</label>
+          <div class="relative">
+            <select id="brief-industry" class="w-full appearance-none px-3.5 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-gray-900 dark:text-white font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:border-transparent transition cursor-pointer text-sm shadow-2xs">
+              <!-- JS Injected Options -->
+            </select>
+            <div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-gray-400 dark:text-neutral-500">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTROL 3: PROJECT SCOPE / MODIFIER ENHANCEMENT -->
+        <div class="flex flex-col gap-1.5 col-span-1">
+          <label for="brief-scope" class="text-[10px] font-extrabold text-gray-400 dark:text-neutral-500 uppercase tracking-widest px-1">Project Scope</label>
+          <div class="relative">
+            <select id="brief-scope" class="w-full appearance-none px-3.5 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-gray-900 dark:text-white font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:border-transparent transition cursor-pointer text-sm shadow-2xs">
+              <option value="standard">Standard Brief</option>
+              <option value="startup">Startup Speed (Tight Timeline)</option>
+              <option value="enterprise">Enterprise Overhaul (Intense Scope)</option>
+              <option value="freelance">Freelance Quick-fix (Relaxed)</option>
+            </select>
+            <div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-gray-400 dark:text-neutral-500">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MAIN BUTTON FOR GENERATION -->
+    <button id="generate-btn" class="w-full md:w-auto md:min-w-[320px] px-8 py-4 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 hover:from-blue-600 hover:via-indigo-600 hover:to-purple-700 text-white font-bold text-base rounded-xl shadow-lg shadow-indigo-500/15 hover:shadow-xl hover:shadow-indigo-500/25 transition transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer inline-flex items-center justify-center gap-2.5">
+      <span>Generate Practice Brief</span>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+    </button>
+
+    <!-- OUTPUT AREA BRIEF CONTAINER (Hidden initially) -->
+    <div id="brief-output-container" class="hidden w-full mt-10 text-left animate-fade-in space-y-4">
+      
+      <!-- MAIN BRIEF CARD -->
+      <div id="brief-card" class="w-full bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800/80 rounded-2xl shadow-xl p-6 md:p-8 relative overflow-hidden theme-transition">
+        
+        <!-- Decorative internal top ribbon tag -->
+        <div class="absolute top-0 right-0 px-4 py-1.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[9px] font-black tracking-widest uppercase rounded-bl-xl select-none">
+          GoodBrief Client Spec
+        </div>
+
+        <div id="brief-content" class="space-y-6">
+          <!-- Card Header Section -->
+          <div class="flex justify-between items-start flex-wrap gap-4">
+            <div>
+              <span id="brief-meta-badge" class="inline-block text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">
+                Website &bull; Technology
+              </span>
+              <h2 id="brief-company-name" class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                Aura Systems
+              </h2>
+            </div>
+            
+            <!-- COHESIVE GAMIFIED TIMER WIDGET COMPONENT -->
+            <div class="bg-gray-50 dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-2 rounded-xl flex items-center gap-3 shadow-3xs select-none">
+              <div class="flex flex-col text-right">
+                <span class="text-[9px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Practice Timer</span>
+                <span id="timer-display" class="font-mono text-sm font-bold text-gray-800 dark:text-neutral-200">00:00:00</span>
+              </div>
+              <button id="timer-control-btn" title="Start/Pause Timer" class="w-7 h-7 rounded-lg bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-neutral-700 transition cursor-pointer">
+                <svg id="timer-icon-play" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="timer-icon-pause" class="w-3.5 h-3.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Divider line -->
+          <div class="h-[1px] w-full bg-gray-100 dark:bg-neutral-800/80"></div>
+
+          <!-- Background Summary -->
+          <div>
+            <h3 class="text-xs font-extrabold text-gray-400 dark:text-neutral-500 uppercase tracking-widest mb-2">1. Company Background</h3>
+            <p id="brief-company-desc" class="text-gray-700 dark:text-neutral-300 leading-relaxed text-sm md:text-base">
+              <!-- Injected by generator -->
+            </p>
+          </div>
+
+          <!-- Deliverables & Checklist Requirements -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-xs font-extrabold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">2. Design Tasks & Requirements Checklist</h3>
+              <span class="text-[10px] text-gray-400 dark:text-neutral-500 italic">Click tasks to check off progress</span>
+            </div>
+            <div id="brief-job-desc" class="text-gray-700 dark:text-neutral-300 space-y-3 leading-relaxed text-sm md:text-base">
+              <!-- Formatted with inputs inside via JS -->
+            </div>
+          </div>
+
+          <!-- Divider line -->
+          <div class="h-[1px] w-full bg-gray-100 dark:bg-neutral-800/80"></div>
+
+          <!-- Timeline & Interactive Palettes Info Row -->
+          <div class="flex items-center justify-between flex-wrap gap-4 pt-1">
+            <div>
+              <h3 class="text-xs font-extrabold text-gray-400 dark:text-neutral-500 uppercase tracking-widest mb-1">3. Projected Timeline</h3>
+              <p id="brief-deadline" class="text-gray-900 dark:text-white font-bold text-sm md:text-base">
+                4 weeks from now
+              </p>
+            </div>
+            
+            <div class="flex flex-col items-start md:items-end gap-1.5">
+              <h3 class="text-xs font-extrabold text-gray-400 dark:text-neutral-500 uppercase tracking-widest self-start md:self-end">4. Suggested Palette <span class="text-[9px] lowercase font-normal text-gray-400">(Click to copy)</span></h3>
+              <div id="color-swatches" class="flex gap-2 mt-0.5">
+                <!-- Color palette bubbles loaded via Javascript -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- MAIN ACTION EXPORT BUTTONS BAR -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
+        <!-- REGENERATE BUTTON -->
+        <button id="action-regenerate" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-gray-800 dark:text-white font-bold text-xs md:text-sm rounded-xl transition cursor-pointer flex items-center justify-center gap-2 border border-transparent">
+          <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+          </svg>
+          <span>Regenerate</span>
+        </button>
+
+        <!-- COPY TEXT BUTTON -->
+        <button id="action-copy" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-gray-800 dark:text-white font-bold text-xs md:text-sm rounded-xl transition cursor-pointer flex items-center justify-center gap-2 border border-transparent">
+          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"></path>
+          </svg>
+          <span id="copy-btn-text">Copy Specification</span>
+        </button>
+
+        <!-- EXPORT PDF DOCUMENT -->
+        <button id="action-pdf" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-gray-800 dark:text-white font-bold text-xs md:text-sm rounded-xl transition cursor-pointer flex items-center justify-center gap-2 border border-transparent">
+          <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
+          </svg>
+          <span>Export PDF</span>
+        </button>
+
+        <!-- EXPORT IMAGE PNG SCREENSHOT -->
+        <button id="action-image" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-gray-800 dark:text-white font-bold text-xs md:text-sm rounded-xl transition cursor-pointer flex items-center justify-center gap-2 border border-transparent col-span-2 md:col-span-1">
+          <svg id="image-btn-spinner" class="hidden animate-spin h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <svg id="image-btn-icon" class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z"></path>
+          </svg>
+          <span id="image-btn-text">Export Image</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- NEWSLETTER FORM BOX -->
+    <div class="w-full mt-14 pt-8 border-t border-gray-100 dark:border-neutral-900 text-center">
+      <div class="max-w-md mx-auto px-2">
+        <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-1">Goodbrief Newsletter</h4>
+        <p class="text-xs text-gray-400 dark:text-neutral-500 mb-4 leading-relaxed">
+          Design tips, industry resources, and hand-curated practice briefs delivered weekly.
+        </p>
+        <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2" novalidate>
+          <input type="email" id="newsletter-email" required placeholder="Enter your email address" aria-label="Email address for newsletter" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-gray-900 dark:text-white text-xs focus:outline-hidden focus:ring-2 focus:ring-purple-500 transition shadow-3xs">
+          <button type="submit" class="px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold text-xs rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition cursor-pointer whitespace-nowrap shadow-3xs">
+            Subscribe
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- NOTIFICATION TOAST OVERLAY -->
+  <div id="toast-notification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition duration-300 ease-out flex items-center gap-3 px-4 py-3.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-xl text-xs font-semibold">
+    <div class="w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 dark:text-emerald-600 shrink-0">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+    </div>
+    <span id="toast-message">Success!</span>
+  </div>
+
+  <!-- PERSISTENT FOOTER METADATA -->
+  <footer class="w-full max-w-6xl mx-auto px-4 py-6 mt-auto border-t border-gray-100 dark:border-neutral-900/60 text-[11px] text-gray-400 dark:text-neutral-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-1.5 flex-wrap justify-center sm:justify-start">
+      <span>&copy; 2026 Good Brief Clone. Inspired by version 3.0.</span>
+      <span class="hidden sm:inline text-gray-300 dark:text-neutral-800">&bull;</span>
+      <span>Made by <a href="https://tmahmed931-art.github.io/profile/" target="_blank" rel="noopener noreferrer" class="hover:text-purple-600 dark:hover:text-purple-400 underline decoration-dotted transition font-medium">MoMo</a></span>
+    </div>
+    <div class="flex items-center gap-4 flex-wrap justify-center sm:justify-end">
+      <span class="font-mono bg-gray-50 dark:bg-neutral-950 px-2 py-0.5 rounded-sm border border-gray-100 dark:border-neutral-900">v3.0 Enhanced</span>
+      <span class="text-center sm:text-right">Share your work with <span class="font-semibold text-gray-600 dark:text-neutral-400">#goodbrief</span> on Instagram & Bluesky</span>
+    </div>
+  </footer>
+
+  <!-- ADVANCED GENERATION DATA ENGINE SCRIPT -->
+  <script>
+    // --- DICTIONARY ARRAYS ---
+    const jobTypes = [
+      "Website", "App", "Logo", "Brand Identity", "Packaging", 
+      "Poster", "Social Media Post", "Illustration", "Brochure", "Business Card", 
+      "T-Shirt", "Book Cover", "Infographic", "Motion Graphics", "UI Kit", 
+      "Icon Set", "Typography", "Editorial Design", "Exhibition", "Vehicle Wrap"
+    ];
+
+    const industries = [
+      "Technology", "Food & Beverage", "Fashion", "Healthcare", "Retail", 
+      "Entertainment", "Education", "Finance", "Real Estate", "Travel", 
+      "Automotive", "Sports", "Non-Profit", "E-commerce", "Gaming", 
+      "Beauty", "Environment", "Music", "Fitness", "Hospitality"
+    ];
+
+    const industryData = {
+      "Technology": {
+        names: ["QuantumSync", "NebulaCore", "AlphaByte", "CloudPulse", "DataVortex", "CortexAI", "AppForge", "NetStrata", "ByteWave", "OmniTech", "Synapse", "VoltNode"],
+        buzzword: "advanced artificial intelligence tools and cloud storage analytics infrastructure",
+        audience: "enterprise CTOs, technology directors, developer teams, and fast-scaled startups",
+        competitors: "Stripe, Vercel, Datadog, AWS, and Snowflake",
+        colors: ["#2563EB", "#7C3AED", "#0F172A", "#10B981"],
+        keywords: ["cutting-edge", "high-tech", "dependable", "scalable", "minimalist"]
+      },
+      "Food & Beverage": {
+        names: ["Fizz & Flora", "BakeHouse Co.", "HarvestTable", "DailyGrind", "ZestOrganic", "VelvetBrew", "CraveKitchen", "SpiceRoute", "UrbanBite", "SweetNook", "BrewBound"],
+        buzzword: "organic naturally sweetened cold-pressed botanical sodas and premium fermented health drinks",
+        audience: "health-conscious millennials, fitness-focused urban workers, and eco-minded foodies",
+        competitors: "Oatly, Fever-Tree, Whole Foods, Olipop, and Blue Bottle Coffee",
+        colors: ["#16A34A", "#EA580C", "#CA8A04", "#78350F"],
+        keywords: ["organic", "wholesome", "delicious", "vibrant", "artisan"]
+      },
+      "Fashion": {
+        names: ["Veloce Wear", "Atelier Noir", "Nordic Thread", "Sonder Studio", "Monochrome", "Knit & Co.", "Echo Apparel", "Verdant Silk", "Onyx Label", "TrueFit Label"],
+        buzzword: "upcycled modular luxury streetwear and minimal high-end sustainable wardrobe essentials",
+        audience: "high-fashion trendsetters, design enthusiasts, sustainable living advocates, and Gen Z tastemakers",
+        competitors: "Acne Studios, COS, Everlane, Fear of God, and Off-White",
+        colors: ["#111111", "#6B7280", "#9CA3AF", "#991B1B"],
+        keywords: ["avant-garde", "timeless", "premium", "bold", "expressive"]
+      },
+      "Healthcare": {
+        names: ["MedPulse", "CuraHealth", "AuraCare", "Vitalis Network", "OmniMed", "Zenith Clinical", "Beacon Telehealth", "NovaWell", "CareBound", "Lumina Health"],
+        buzzword: "on-demand pediatric virtual consultations and cloud-connected remote biometric monitoring",
+        audience: "busy working mothers, remote rural elderly individuals, chronic health patients, and general practitioners",
+        competitors: "One Medical, Teladoc, Oscar Health, Forward, and Hims & Hers",
+        colors: ["#0EA5E9", "#059669", "#1E3A8A", "#475569"],
+        keywords: ["empathetic", "secure", "approachable", "professional", "sterile"]
+      },
+      "Retail": {
+        names: ["Cornerstone Market", "Bespoke Goods", "Foundry & Co.", "The General Store", "Gilded Aisles", "LocalStock", "Acorn Provisions", "Nook & Cranny", "Curated Space"],
+        buzzword: "zero-waste community general stores focusing on ethically crafted homeware and local culinary goods",
+        audience: "neighborhood families, local artisans, zero-waste lifestyle practitioners, and interior designers",
+        competitors: "Target, MUJI, Anthropologie, local independent boutiques, and West Elm",
+        colors: ["#D97706", "#451A03", "#71717A", "#18181B"],
+        keywords: ["crafted", "welcoming", "authentic", "community-driven", "tactile"]
+      },
+      "Entertainment": {
+        names: ["Stellar Pictures", "BingeWave", "NeonArcade", "SoundStage Media", "Fable Studios", "Epicenter Live", "Vivid Entertainment", "Riddle Box", "Kinetic Media"],
+        buzzword: "interactive spatial audio audio-dramas, streaming indie multimedia documentaries, and immersive live event coverage",
+        audience: "casual cinephiles, podcast superfans, audio engineers, pop culture fanatics, and digital nomads",
+        competitors: "Netflix, A24, Spotify, Criterion Channel, and Twitch",
+        colors: ["#DC2626", "#4F46E5", "#171717", "#FACC15"],
+        keywords: ["thrilling", "creative", "captivating", "cinematic", "dynamic"]
+      },
+      "Education": {
+        names: ["MindSprout", "EduVerse", "SkillForge", "LearnLoop", "Codex Academy", "BrightPath", "Curio Kids", "Summit Prep", "ScholarStream", "AlphaLearners"],
+        buzzword: "gamified localized interactive computer-science learning software tailored explicitly for primary school children",
+        audience: "progressive educators, homeschool cooperatives, tech-forward parents, and enthusiastic young students",
+        competitors: "Duolingo, MasterClass, Khan Academy, Coursera, and Outschool",
+        colors: ["#2563EB", "#F59E0B", "#10B981", "#EC4899"],
+        keywords: ["engaging", "cheerful", "accessible", "empowering", "educational"]
+      },
+      "Finance": {
+        names: ["Vaulted", "LedgerPay", "Apex Capital", "PennyWise", "Strata Wealth", "Minted NeoBank", "Krypton Finance", "Thrive Advisors", "Equinox Trading"],
+        buzzword: "fractional automated micro-investing indexes and transparent multi-currency borderless credit systems",
+        audience: "first-generation immigrant freelance workers, young retail investors, digital gig workers, and students",
+        competitors: "Revolut, Robinhood, Wise, Chime, and Wealthfront",
+        colors: ["#047857", "#1E293B", "#475569", "#111827"],
+        keywords: ["trusted", "secure", "lucrative", "transparent", "prestigious"]
+      },
+      "Real Estate": {
+        names: ["Hearth & Home", "TerraGroup", "Skyline Realty", "UrbanNest", "Vista Properties", "Haven & Co.", "Dwelling Group", "Modus Living", "Apex Dwellings"],
+        buzzword: "architecturally significant low-carbon subterranean luxury residences and high-tech urban micro-lofts",
+        audience: "minimalist architecture connoisseurs, high-net-worth eco-investors, retired couples, and remote professionals",
+        competitors: "Zillow, Redfin, Compass, Sotheby's Realty, and Airbnb Plus",
+        colors: ["#78350F", "#292524", "#A8A29E", "#451A03"],
+        keywords: ["architectural", "luxurious", "sustainable", "solid", "refined"]
+      },
+      "Travel": {
+        names: ["Wanderlust Co.", "RoamFree", "Wayfarer Outposts", "Terra Incognita", "Nomad Route", "Compass Rose", "Vagabond", "Hidden Trails", "Vista Expeditions"],
+        buzzword: "off-grid luxury geodetic glamping modules and hyper-localized self-guided bicycle exploration tours",
+        audience: "adventure seekers, carbon-neutral travelers, landscape photographers, and burnt-out corporate staff",
+        competitors: "Airbnb, National Geographic Expeditions, Lonely Planet, and TripAdvisor",
+        colors: ["#0284C7", "#15803D", "#E2E8F0", "#EA580C"],
+        keywords: ["adventurous", "inspiring", "geographic", "breathable", "vivid"]
+      },
+      "Automotive": {
+        names: ["VoltMotors", "Apex Mechanics", "Revline", "Grid Performance", "Shift EV", "Crux Engineering", "Aerodynamic Labs", "Velocity Custom", "Ember Motors"],
+        buzzword: "modular hyper-efficient autonomous electric transport vans and retrofitted performance hydrogen sports cars",
+        audience: "commercial delivery fleets, luxury car enthusiasts, technology lovers, and performance racing fans",
+        competitors: "Tesla, Rivian, Porsche, Polestar, and Rimac",
+        colors: ["#DC2626", "#1F2937", "#6B7280", "#111827"],
+        keywords: ["aerodynamic", "powerful", "engineered", "precise", "aggressive"]
+      },
+      "Sports": {
+        names: ["IronClad Athletics", "Apex Performance", "Endure Sport", "Pulse Wear", "Summit Gear", "Kinetic Lab", "Vanguard Sports", "Grit & Glory", "Swift Velocity"],
+        buzzword: "smart biometric-tracking adaptive smart sportswear and specialized compression technical training gear",
+        audience: "marathon runners, triathletes, professional sport coaches, collegiate athletes, and fitness geeks",
+        competitors: "Nike, Under Armour, Gymshark, On Running, and Lululemon",
+        colors: ["#EA580C", "#111827", "#9CA3AF", "#2563EB"],
+        keywords: ["athletic", "high-performance", "energetic", "resilient", "bold"]
+      },
+      "Non-Profit": {
+        names: ["GreenFuture Initiative", "The Canopy Group", "OpenHand Foundation", "Lifeline Worldwide", "OceanShield", "EduGive", "Kindred Commons", "EqualPath", "EcoVoice"],
+        buzzword: "decentralized water filtration distributions and scalable localized agroforestry community programs",
+        audience: "philanthropic foundations, corporate ESG managers, grassroots volunteers, and empathetic citizens",
+        competitors: "Charity: Water, World Wildlife Fund, Red Cross, and Bill & Melinda Gates Foundation",
+        colors: ["#059669", "#2563EB", "#047857", "#0F172A"],
+        keywords: ["altruistic", "impactful", "transparent", "global", "hopeful"]
+      },
+      "E-commerce": {
+        names: ["CartCrafter", "SwiftMarket", "ShopSphere", "Parcel & Post", "VibeCart", "OmniStore", "DirectDrop", "The Digital Aisle", "Bazaar Tech"],
+        buzzword: "aggregated next-generation 3D shopping marketplaces offering curated hand-made consumer goods globally",
+        audience: "independent global crafters, convenience shoppers, boutique collectors, and remote consumers",
+        competitors: "Amazon, Shopify, Etsy, eBay, and Faire",
+        colors: ["#4F46E5", "#EC4899", "#262626", "#4338CA"],
+        keywords: ["seamless", "ubiquitous", "diverse", "friendly", "transactional"]
+      },
+      "Gaming": {
+        names: ["PixelForge", "Vortex Interactive", "IronHide Games", "Glitch Studios", "GG Interactive", "FrostByte", "CyberShell", "Mythic Realm", "LevelUp Labs"],
+        buzzword: "narrative-driven high-fidelity atmospheric single-player rogue-like roleplaying desktop video games",
+        audience: "hardcore PC gamers, indie stream viewers, fantasy enthusiasts, and creative directors",
+        competitors: "Epic Games, Steam, Nintendo, Riot Games, and CD Projekt Red",
+        colors: ["#9333EA", "#F43F5E", "#0B0F19", "#06B6D4"],
+        keywords: ["immersive", "cybernetic", "mystical", "addictive", "cinematic"]
+      },
+      "Beauty": {
+        names: ["Glow Theory", "Lumina Botanicals", "Velvet Skin", "Pure Radiance", "Aura Cosmetic", "Naked Botanical", "Silk & Suede", "Bespoke Beauty", "Orchid Labs"],
+        buzzword: "microbiome-friendly cold-processed natural facial oils and adaptive clinical skin tone serums",
+        audience: "skincare ritual enthusiasts, clean beauty consumers, editorial makeup artists, and salons",
+        competitors: "Glossier, Fenty Beauty, Aesop, Ordinary, and Sephora",
+        colors: ["#F472B6", "#F59E0B", "#78350F", "#44403C"],
+        keywords: ["elegant", "radiant", "minimal", "luxurious", "soothing"]
+      },
+      "Environment": {
+        names: ["TerraPulse", "Solaris Grid", "EcoWave Solutions", "ReLeaf Labs", "CleanCurrent", "BioSphere Corp", "Verdant Power", "EnviroLoop", "Kinetic Earth"],
+        buzzword: "smart domestic composting hardware appliances and regional community solar energy sharing networks",
+        audience: "suburban homeowners, eco-conscious buyers, civic engineering councils, and climate activists",
+        competitors: "Tesla Energy, Patagonia, Nest, and localized alternative utility suppliers",
+        colors: ["#15803D", "#0284C7", "#4D7C0F", "#1E293B"],
+        keywords: ["ecological", "renewable", "clean", "intelligent", "grounded"]
+      },
+      "Music": {
+        names: ["SoundWave Records", "EchoChamber", "Modulation Labs", "AudioVibe", "Vivid Track", "Harmonic Sound", "Fret & Key", "Groove Theory", "Resonance Media"],
+        buzzword: "lossless premium audio distribution catalogs and smart custom electronic synthesizer equipment layouts",
+        audience: "audiophiles, independent underground musicians, audio engineers, and electronic club DJs",
+        competitors: "Splice, SoundCloud, Native Instruments, Bandcamp, and Teenage Engineering",
+        colors: ["#111111", "#FF007F", "#00FFFF", "#374151"],
+        keywords: ["sonic", "vibrant", "analog", "rebellious", "precise"]
+      },
+      "Fitness": {
+        names: ["Grit Fitness", "CorePulse Studio", "Vigor Athletics", "IronShed", "Primal Movement", "Zenith Fit", "Tempo Studio", "Velocity Lab", "Forge Fitness"],
+        buzzword: "high-intensity low-impact smart home training equipment setups and private coaching software services",
+        audience: "busy corporate executives, crossfit competitors, home workout creators, and athletic beginners",
+        competitors: "Peloton, WHOOP, Apple Fitness, Equinox, and Crossfit Inc.",
+        colors: ["#E11D48", "#0F172A", "#475569", "#1E3A8A"],
+        keywords: ["powerful", "motivating", "raw", "engineered", "uncompromising"]
+      },
+      "Hospitality": {
+        names: ["The Luminary Hotel", "Haven Stay", "Cozy Corner Cafes", "The Roost Resort", "Vagabond Lodges", "Bespoke Suites", "Alpina Chalets", "Urban Oasis Hostels"],
+        buzzword: "hyper-curated regional boutique wellness hotels featuring therapeutic sensory integration mineral hot springs",
+        audience: "luxury leisure tourists, travel bloggers, corporate retreat organizers, and wellness practitioners",
+        competitors: "Aman Resorts, Ace Hotel, Soho House, and luxury Airbnb collections",
+        colors: ["#7C2D12", "#C2410C", "#1E293B", "#451A03"],
+        keywords: ["hospitable", "luxurious", "restorative", "cozy", "prestigious"]
+      }
+    };
+
+    const jobTemplates = {
+      "Website": {
+        intro: "We require a state-of-the-art digital storefront and high-performance user experience. The website must capture lead actions effectively, explain our technical features eloquently, and establish modern design authority.",
+        bullets: [
+          "Design a high-converting conversion landing page with structural clear hero sections, benefits grids, and a persistent sticky header menu.",
+          "Produce structured page wireframes for 'Product Overview', 'Pricing Layouts', and an interactive customer 'Case Studies' overview.",
+          "Ensure extreme fluid responsiveness starting from small screen mobile viewports (375px) up to premium widescreen displays (1440px+).",
+          "Include a detailed typography specification utilizing highly readable accessible system-level typeface hierarchies.",
+          "Integrate clean utility components like contextual feedback elements, accordion FAQs, and dark mode toggles."
+        ],
+        deliverables: "High-fidelity clickable web layouts (Figma or Sketch), a global UI style block system sheet, fully documented user navigation flow states, and exported vector icon assets."
+      },
+      "App": {
+        intro: "We want to design a beautiful, cohesive, and deeply intuitive mobile app experience (iOS and Android native). The primary workflow must facilitate daily micro-actions, alleviate user cognitive friction, and feature tactile touch states.",
+        bullets: [
+          "Map out an onboarding experience consisting of a 3-step high-impact slider value proposition showcase.",
+          "Design the main interactive user dashboard highlighting personalized metrics charts, notifications, and swift primary actions.",
+          "Incorporate thumb-friendly touch target layouts adhering strictly to Apple Human Interface and Android Material Design systems.",
+          "Draft specialized viewports explaining loading placeholder skeletons, zero-data empty states, and field validation error alerts.",
+          "Implement elegant layout settings interfaces with micro-interactions toggling custom notifications settings."
+        ],
+        deliverables: "10-15 high-fidelity atomic design app viewports, functional prototype linkage documentation, full interactive component kit layout, and font assets."
+      },
+      "Logo": {
+        intro: "We seek a distinctive, high-impact mark that distills our core identity into a timeless signature. It should be highly recognizable, visually balanced, versatile across diverse scales, and separate us from standard competitors.",
+        bullets: [
+          "Develop an innovative combination mark featuring both an integrated abstract emblem symbol and an elegant balanced logotype.",
+          "Ensure exceptional optical readability and scaling from a 32x32 pixel digital favicon up to giant highway vehicle wraps.",
+          "Craft standalone alternate arrangements including horizontal lockups, vertical centrings, and simplified badge forms.",
+          "Formulate structural parameters ensuring the logo functions beautifully as a single-color vector cutout silhouette on black backgrounds.",
+          "Avoid predictable, uninspired industry visual metaphors in favor of sophisticated geometry or expressive letterforms."
+        ],
+        deliverables: "Vector primary logo source files (.SVG, .EPS), custom monochrome black/white alternatives, safe spacing margin layouts, and a single-page brand mark sheet."
+      },
+      "Brand Identity": {
+        intro: "We need a complete structural brand identity system that creates a unified, memorable presence across every customer touchpoint. Every asset should tell a coherent story, evoking trust and design craftsmanship.",
+        bullets: [
+          "Establish an extensive color palette blueprint highlighting primary accents, secondary tones, neutral shades, and dark system defaults.",
+          "Select a pair of contrasting typefaces: a commanding high-character display headline font and an incredibly legible body font.",
+          "Design a corporate stationery package including letterhead patterns, presentation slide templates, and email signature blocks.",
+          "Formulate a scalable digital asset grid layout rule defining how textures, shapes, or lifestyle imagery interact with textual claims.",
+          "Write a concise brand application rulebook summarizing improper usage boundaries, minimum size limits, and tonal styling voice."
+        ],
+        deliverables: "An exhaustive multi-page Brand Identity Style Guidebook, custom structural color swatch system palettes, corporate asset packs, and presentation deck templates."
+      },
+      "Packaging": {
+        intro: "We need a physical unboxing packaging experience that commands premium shelf presence, honors sustainable material layouts, and highlights key product benefits clearly.",
+        bullets: [
+          "Design structural packaging box panels or bottle wrap labels including safe die-cut bleed margins and product fold line setups.",
+          "Ensure primary typography, product naming, and key weight indicators are instantly legible from 3 meters away under shelf lighting.",
+          "Incorporate designated areas for universal barcode matrices, ingredient text lists, and environmental certification iconography.",
+          "Utilize a tactile, cohesive composition that matches our visual language guidelines and plays with matte or gloss textures.",
+          "Create a stunning structural unboxing layer arrangement that builds delight and premium brand anticipation upon opening."
+        ],
+        deliverables: "Production-ready vector package die-lines with technical layer labels, high-resolution 3D digital mockup configurations, and exact material finish specs."
+      },
+      "Poster": {
+        intro: "We require a high-impact advertising poster design that commands instant visual attention in busy urban landscapes. It must bridge information hierarchy with striking creative illustration or photography layout.",
+        bullets: [
+          "Craft a striking focal-point illustration or photographic arrangement that stops passersby instantly.",
+          "Structure data formatting with clear hierarchical text weight layers (Core Title, Sub-details, Date, and Location).",
+          "Ensure optimal text contrast margins allowing immediate long-distance legibility under mixed ambient lighting settings.",
+          "Dedicate clear real estate for social hashtags, QR scan codes, and secondary sponsor logo rows.",
+          "Maintain proper aspect ratio bleed buffers specifically for standard large-format print setups (e.g., A1, 24x36 inches)."
+        ],
+        deliverables: "High-resolution print-ready CMYK PDFs with crop marks, RGB digital versions tailored for screen displays, and layered source mockups."
+      },
+      "Social Media Post": {
+        intro: "We need a highly engaging, cohesive library of social media graphic layouts that boost audience interaction, spark comment shares, and establish a uniform feed aesthetic.",
+        bullets: [
+          "Design a modular 5-slide educational swipeable carousel layout focusing on clear storytelling progressions.",
+          "Produce attention-grabbing post formats optimized for square grids, tall vertical stories, and widescreen banner frames.",
+          "Incorporate bold typographic quote layouts, clear numerical graph charts, or illustrative background elements.",
+          "Maintain persistent subtle brand recognition tags through fixed watermark emblems or standardized color margin systems.",
+          "Design high-contrast text overlay safe-zones that ensure messaging isn't clipped by native user UI overlays."
+        ],
+        deliverables: "6 reusable layered social template canvas files, specific font pairings guide, asset folders containing background accents, and an export guide."
+      },
+      "Illustration": {
+        intro: "We want a custom editorial artwork illustration asset that injects unique personality into our storytelling channels. The style should be contemporary, highly original, and visually aligned with our core values.",
+        bullets: [
+          "Establish an illustrative style vector vocabulary (e.g., minimalist line art, grainy texture vectors, or bold flat color blocks).",
+          "Portray complex abstract industry metaphors in an approachable, human, and captivating composition.",
+          "Maintain absolute flexibility, allowing specific components of the artwork to be separated and rearranged across alternative layouts.",
+          "Inject custom color parameters drawn directly from our technical system specifications.",
+          "Ensure crisp asset rendering, avoiding pixelation by exporting native paths perfectly."
+        ],
+        deliverables: "Layered master vector files (.AI, .SVG), ultra-high-res isolated transparent PNG exports, and a color alternate configuration list."
+      },
+      "Brochure": {
+        intro: "We require a professional multi-page print brochure layout to distribute at trade conventions and client meetups. It must condense our expansive services into a premium, easily browsed paper document.",
+        bullets: [
+          "Establish a beautiful tri-fold or bi-fold page map layout that controls user informational onboarding reading habits fluidly.",
+          "Incorporate high-contrast text boxes, professional bullet roundups, and clear team quote highlight banners.",
+          "Design custom stylized technical icons or charts to replace dense text paragraphs where possible.",
+          "Prepare print panel margin compensation preventions so folded columns line up with pixel perfection.",
+          "Select premium print specification recommendations including optimal paper weight suggestions and tactile emboss treatments."
+        ],
+        deliverables: "Print-ready CMYK PDF documents with appropriate bleed lines, packaged design project files, and digital layout versions."
+      },
+      "Business Card": {
+        intro: "We need an elegant, memorable business card design that serves as a premium networking handshake asset. It should feel incredibly professional and stick out in a stack of standard cards.",
+        bullets: [
+          "Design both a clean minimalist front layout and an impactful decorative back branding statement.",
+          "Incorporate essential data tags (Full Name, Professional Title, Direct Phone, Email Link, and Web Portal QR code).",
+          "Ensure font point sizing stays perfectly readable at compact physical print sizes without ink blurring issues.",
+          "Propose distinctive physical enhancement additions like rounded corners, metallic foil stamp overlays, or spot-UV layers.",
+          "Provide flexible templates enabling rapid name swaps for upcoming employee onboarding expansions."
+        ],
+        deliverables: "Print-ready double-sided vector layouts with clear crop boundaries, individual name variant exports, and a material finish guide."
+      },
+      "T-Shirt": {
+        intro: "We are developing a premium merchandise apparel release that our community will proudly wear out in public. It must look like high-end streetwear or tasteful retail clothing rather than a corporate giveaway.",
+        bullets: [
+          "Design a large-scale graphic illustration layout for the back panel and a minimal subtle accent emblem for the front left chest area.",
+          "Restrict the total ink color palette spectrum to ensure economical, high-quality vector screen-printing production.",
+          "Incorporate tasteful custom typography alongside our central industry keywords or brand statements.",
+          "Account for apparel color contrast variables, ensuring graphics pop perfectly on both dark washed fabrics and clean whites.",
+          "Create a small integrated custom inner neck-label design including size markers and wash care icon layout placeholders."
+        ],
+        deliverables: "Production-scale vector print files mapped out in exact Pantone color swatches, realistic apparel fabric 3D mockup previews."
+      },
+      "Book Cover": {
+        intro: "We need an evocative, conceptually deep book cover artwork setup that immediately communicates core thematic undertones and demands attention on physical shelves and digital e-reader grids.",
+        bullets: [
+          "Craft a compelling front cover layout combining an ambiguous focal graphic with commanding typographic author and title text.",
+          "Calculate variable spine text layout parameters based on projected page count thickness data specs.",
+          "Incorporate a beautifully arranged back jacket layout including a summary review block, barcode box, and author headshot frame.",
+          "Ensure title text remains fully legible when scaled down to a tiny thumbnail inside digital store interfaces.",
+          "Incorporate balanced contrast margins that capture the specific emotional tone of our company keywords."
+        ],
+        deliverables: "Full flat jacket print file (Front, Spine, Back) with technical crop marks, high-resolution 3D book mockup renders."
+      },
+      "Infographic": {
+        intro: "We need a compelling data visualization infographic that translates dense multi-source research metrics into an easily digestible visual story map.",
+        bullets: [
+          "Structure an intuitive top-to-bottom reading grid that introduces a core problem, maps data insights, and ends with a clear summary conclusion.",
+          "Translate plain text numbers into custom radial charts, structured comparison blocks, and elegant process timelines.",
+          "Maintain a rigid visual theme by pairing minimal graphic icons with high-contrast color highlights.",
+          "Include proper footer real estate for professional source tracking citations and brand authorship links.",
+          "Optimize horizontal layout dimensions ensuring perfect sharing readability across corporate blogs and Pinterest boards."
+        ],
+        deliverables: "Ultra-high-resolution digital infographic vector files, chopped multi-slide snippet crops for alternative social slide integration."
+      },
+      "Motion Graphics": {
+        intro: "We are planning a 30-second promotional explainer video and need a stunning structural storyboard blueprint and conceptual vector art direction system.",
+        bullets: [
+          "Develop an 8-frame sequential narrative storyboard grid tracking camera motion callouts and narration scripting lines.",
+          "Design unified style frames establishing exactly how kinetic text, custom icons, and background environments render live.",
+          "Utilize dynamic transitions, accent shape bursts, and sleek pacing cues noted in technical text descriptions.",
+          "Ensure layout assets conform to standard cinematic video resolutions (1920x1080, 16:9 aspect ratio or square 1:1 format).",
+          "Incorporate precise timeline instructions indicating where to cue audio effects and voiceover pauses."
+        ],
+        deliverables: "Layered high-res vector style frames, fully scripted storyboard PDF sequence document, and individual vector moving elements folders."
+      },
+      "UI Kit": {
+        intro: "We need an atomic, hyper-organized user interface component library that allows engineering teams to build software layouts quickly while maintaining flawless design consistency.",
+        bullets: [
+          "Design comprehensive button matrices covering active, hover, focused, disabled, and loading states across primary and secondary button types.",
+          "Produce uniform form inputs including text entry spaces, checkbox states, drop-down menus, and toggle selectors.",
+          "Establish global layout grids, typography tokens, and spacing scale rules (e.g., 4px/8px incremental padding rules).",
+          "Incorporate light/dark system layout switch alternatives for every component state designed.",
+          "Utilize smart auto-layout frames and clear naming variables (e.g., button/primary/default) for flawless integration."
+        ],
+        deliverables: "Fully componentized master UI file with auto-layout structures, a structured global style token cheat sheet, and interactive state mapping."
+      },
+      "Icon Set": {
+        intro: "We require a custom-built, highly cohesive family of 24 utility icons for integration into our product interface menus and physical touchpoints.",
+        bullets: [
+          "Design all icons on a strict pixel-aligned geometric grid framework (e.g., 24x24 pixels) to prevent blurry path edges.",
+          "Maintain unified aesthetic traits across the family including uniform stroke weights, corner rounding ratios, and open/closed paths.",
+          "Ensure each icon symbol maps an immediately recognizable semantic utility meaning (e.g., settings gear, user account profile, analytic charts).",
+          "Optimize vector paths by minimizing anchor counts, guaranteeing lightning-fast digital screen rendering speeds.",
+          "Test icon scale legibility down to ultra-compact micro sizes to confirm cross-platform visual success."
+        ],
+        deliverables: "Master icon sprite sheets, 24 individual clean optimized vector .SVG files, and an architectural grid guideline documentation sheet."
+      },
+      "Typography": {
+        intro: "We need a bespoke display lettering concept or localized wordmark refinement that showcases absolute typographic mastery, distinct letter geometry, and premium custom flourishes.",
+        bullets: [
+          "Develop custom hand-crafted letterform adjustments modifying kerning, baseline weights, and specific serifs or terminal ends.",
+          "Craft specific ligature connections between problematic adjacent character pairings to elevate visual flow.",
+          "Balance negative whitespace tracking within internal letter counters to preserve readability.",
+          "Produce beautiful lockups showing how the unique custom typography responds when paired with standard body text font stacks.",
+          "Ensure the vector anchor node points are placed perfectly at mathematical extremes for smooth, crisp rendering."
+        ],
+        deliverables: "Clean custom typography vector source outputs, alternate variation ligatures list, and a type scaling grid specification card."
+      },
+      "Editorial Design": {
+        intro: "We are launching a high-end multi-page editorial magazine layout or corporate annual print report. The spread design must look sophisticated, spacious, and present complex essays elegantly.",
+        bullets: [
+          "Establish a rigorous multi-column grid layout with ample outer margins and elegant breathing space.",
+          "Design spectacular multi-page feature article spreads with dramatic large drop-cap characters and pull-quote boxes.",
+          "Create clean data layout tables, chapter division title cards, and uniform header/footer running index tags.",
+          "Manage beautiful text interactions ensuring paragraph wraps wrap smoothly around isolated imagery frames.",
+          "Ensure strict paragraph alignment tracking across all pages to match traditional professional publishing aesthetics."
+        ],
+        deliverables: "Complete multi-page editorial layout spread document pack with print crop setup, embedded fonts list, and high-res digital preview file."
+      },
+      "Exhibition": {
+        intro: "We are building an interactive physical trade show booth space and event backdrop presence. The design must attract crowds from afar and translate our digital style into an expansive physical environment.",
+        bullets: [
+          "Design a large-scale structural backdrop wall graphic display incorporating high-elevation brand placement for long-distance sightlines.",
+          "Draft layouts for structural elements including presentation counter wraps, vertical roll-up banner stands, and display screens.",
+          "Maintain generous informational hierarchy sizes ensuring physical text lines remain readable by stands from varied floor angles.",
+          "Account for physical environment obstructions, keeping vital contact info or logos above waist-height levels.",
+          "Incorporate a beautifully balanced aesthetic color block grid that mirrors our company keywords and mood guidelines."
+        ],
+        deliverables: "Large-scale environmental print vector files outputted to specific physical dimensional measurements, 3D architectural booth viewports."
+      },
+      "Vehicle Wrap": {
+        intro: "We need a high-visibility commercial vehicle graphic wrap layout for our corporate transport fleet. It must serve as a high-impact moving billboard that builds instant local brand awareness.",
+        bullets: [
+          "Map out a comprehensive graphic layout that flows seamlessly across driver sides, passenger panels, rear doors, and hood spaces.",
+          "Incorporate large-scale high-contrast brand naming text and core service keywords legible on highway vehicles moving at high speeds.",
+          "Ensure critical content details like phone numbers, web addresses, or app QR codes avoid car handle cuts, panel seams, or window glass clips.",
+          "Utilize bold, dynamic geometric shapes or color blocks that complement the underlying contour model of the vehicle.",
+          "Maintain high contrast against varying atmospheric conditions, bright sunlight, and night streetlamp glares."
+        ],
+        deliverables: "To-scale 2D blueprint wrap layouts mapped out against technical vehicle wireframes, full vector print production preparation packs."
+      }
+    };
+
+    // --- ENHANCED PROCEDURAL GENERATOR CORE ---
+    function generateBrief(selectedType, selectedIndustry, scopeModifier) {
+      const finalType = selectedType === "random" ? jobTypes[Math.floor(Math.random() * jobTypes.length)] : selectedType;
+      const finalIndustry = selectedIndustry === "random" ? industries[Math.floor(Math.random() * industries.length)] : selectedIndustry;
+
+      const ind = industryData[finalIndustry] || industryData["Technology"];
+      const job = jobTemplates[finalType] || jobTemplates["Website"];
+
+      const randomNameSeed = ind.names[Math.floor(Math.random() * ind.names.length)];
+      const companyExtensions = ["Solutions", "Inc.", "Group", "Labs", "Hub", "Collective", "Ventures", "Studios"];
+      const appendExtension = Math.random() > 0.4 ? " " + companyExtensions[Math.floor(Math.random() * companyExtensions.length)] : "";
+      const finalCompanyName = randomNameSeed + appendExtension;
+
+      // Construct Company Narrative
+      const structureTemplates = [
+        `We are a visionary organization leading the market in ${ind.buzzword}. Our primary objective is focused on providing ultimate value to ${ind.audience}. We are recognized across the field for our commitment to high quality, pushing boundaries, and cultivating a ${ind.keywords[0]} culture. We stand out starkly from our chief competitors like ${ind.competitors} by focusing heavily on user-centric design details and frictionless workflows.`,
+        `Operating with a deep mission to empower ${ind.audience}, our brand specializes in next-generation ${ind.buzzword}. As a forward-thinking group, our team values being highly ${ind.keywords[1]} and ${ind.keywords[2]} in everything we build. We want to challenge standard industry models and elevate ourselves above competitive alternatives like ${ind.competitors} through top-tier visual execution and premium presentation.`,
+        `Founded with an emphasis on sustainability and innovation, ${finalCompanyName} proudly delivers ${ind.buzzword} tailored perfectly for ${ind.audience}. Our approach combines a ${ind.keywords[3]} ethos with operational reliability, allowing us to capture market authority over entities like ${ind.competitors}. Moving forward, our core goal is to build long-term relationships through beautifully crafted aesthetic touchpoints.`
+      ];
+      let finalCompanyDesc = structureTemplates[Math.floor(Math.random() * structureTemplates.length)];
+
+      // Apply Scope Modifier specific adjustments
+      let scopeBullets = [...job.bullets];
+      let weeks = Math.floor(Math.random() * 5) + 3; // default 3-7 weeks
+      let scopeLabel = "Standard Project Parameters";
+
+      if (scopeModifier === "startup") {
+        weeks = Math.floor(Math.random() * 2) + 1; // 1-2 weeks
+        scopeLabel = "🔥 Startup Sprint Context (High Urgency)";
+        finalCompanyDesc += " Due to a major upcoming venture financing round, execution speed and high-fidelity visual clarity take immediate precedence.";
+        scopeBullets.push("Incorporate a highly streamlined rapid MVP feature set prioritizing key critical entry paths over extensive sub-views.");
+      } else if (scopeModifier === "enterprise") {
+        weeks = Math.floor(Math.random() * 6) + 8; // 8-14 weeks
+        scopeLabel = "🏛️ Enterprise Architecture Overhaul (Massive Scale)";
+        finalCompanyDesc += " This is an international multi-market structural redesign. All files must support deep localization, cross-department handoffs, and rigid layout systems.";
+        scopeBullets.unshift("Perform extensive responsive accessibility stress-testing ensuring compliance with global WCAG 2.1 AA validation criteria.");
+        scopeBullets.push("Document comprehensive design system specification tokens for engineering handoff including spacing matrices.");
+      } else if (scopeModifier === "freelance") {
+        weeks = Math.floor(Math.random() * 4) + 4; // 4-8 weeks
+        scopeLabel = "☕ Independent Freelance Context";
+        finalCompanyDesc += " This project works with an agile, flexible remote crew focusing on high aesthetic value and localized creative freedom.";
+      }
+
+      const deadlineText = `${weeks} weeks from now (${scopeLabel})`;
+
+      return {
+        id: "brief_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+        type: finalType,
+        industry: finalIndustry,
+        scope: scopeModifier,
+        companyName: finalCompanyName,
+        companyDesc: finalCompanyDesc,
+        bullets: scopeBullets,
+        deliverables: job.deliverables,
+        deadline: deadlineText,
+        colors: ind.colors,
+        timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      };
+    }
+
+    // --- APPLICATION CONTROLLER CLASS/FLOW ---
+    document.addEventListener("DOMContentLoaded", () => {
+      // Elements
+      const typeSelect = document.getElementById("brief-type");
+      const industrySelect = document.getElementById("brief-industry");
+      const scopeSelect = document.getElementById("brief-scope");
+      const generateBtn = document.getElementById("generate-btn");
+      const outputContainer = document.getElementById("brief-output-container");
+      
+      const briefMetaBadge = document.getElementById("brief-meta-badge");
+      const briefCompanyName = document.getElementById("brief-company-name");
+      const briefCompanyDesc = document.getElementById("brief-company-desc");
+      const briefJobDesc = document.getElementById("brief-job-desc");
+      const briefDeadline = document.getElementById("brief-deadline");
+      const colorSwatchesContainer = document.getElementById("color-swatches");
+
+      const actionRegenerate = document.getElementById("action-regenerate");
+      const actionCopy = document.getElementById("action-copy");
+      const actionPdf = document.getElementById("action-pdf");
+      const actionImage = document.getElementById("action-image");
+
+      const themeToggle = document.getElementById("theme-toggle");
+      const sunIcon = document.getElementById("theme-toggle-sun");
+      const moonIcon = document.getElementById("theme-toggle-moon");
+
+      const newsletterForm = document.getElementById("newsletter-form");
+      const newsletterEmail = document.getElementById("newsletter-email");
+      const toast = document.getElementById("toast-notification");
+      const toastMessage = document.getElementById("toast-message");
+      const statsCounter = document.getElementById("stats-counter");
+
+      const historyWrapper = document.getElementById("history-wrapper");
+      const historyToggleBtn = document.getElementById("history-toggle-btn");
+      const historyDropdown = document.getElementById("history-dropdown");
+      const historyItemsList = document.getElementById("history-items-list");
+
+      // Practice Timer Variables
+      const timerDisplay = document.getElementById("timer-display");
+      const timerControlBtn = document.getElementById("timer-control-btn");
+      const timerIconPlay = document.getElementById("timer-icon-play");
+      const timerIconPause = document.getElementById("timer-icon-pause");
+
+      let timerInterval = null;
+      let timerSeconds = 0;
+      let timerRunning = false;
+      let currentActiveBrief = null;
+      let sessionHistory = [];
+
+      // --- POPULATE SELECTION LISTS ---
+      typeSelect.innerHTML = `<option value="random">🎲 Random Job Type</option>`;
+      jobTypes.forEach(t => { typeSelect.innerHTML += `<option value="${t}">${t}</option>`; });
+
+      industrySelect.innerHTML = `<option value="random">🎲 Random Industry</option>`;
+      industries.forEach(i => { industrySelect.innerHTML += `<option value="${i}">${i}</option>`; });
+
+      // --- LIVE STATS BADGE MOCK TICKER ---
+      let baseCount = 11492804;
+      setInterval(() => {
+        baseCount += Math.floor(Math.random() * 3) + 1;
+        statsCounter.innerText = baseCount.toLocaleString();
+      }, 4500);
+
+      // --- THEME STATE CONTROLLER ---
+      function updateThemeUI() {
+        if (document.documentElement.classList.contains("dark")) {
+          sunIcon.classList.remove("hidden");
+          moonIcon.classList.add("hidden");
+        } else {
+          sunIcon.classList.add("hidden");
+          moonIcon.classList.remove("hidden");
+        }
+      }
+      updateThemeUI();
+
+      themeToggle.addEventListener("click", () => {
+        if (document.documentElement.classList.contains("dark")) {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("theme", "light");
+        } else {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("theme", "dark");
+        }
+        updateThemeUI();
+      });
+
+      // --- TOAST SYSTEMS ---
+      function showToast(message) {
+        toastMessage.innerText = message;
+        toast.classList.remove("opacity-0", "pointer-events-none", "translate-y-20");
+        toast.classList.add("opacity-100", "translate-y-0");
+        
+        setTimeout(() => {
+          toast.classList.remove("opacity-100", "translate-y-0");
+          toast.classList.add("opacity-0", "pointer-events-none", "translate-y-20");
+        }, 3000);
+      }
+
+      // --- SESSION HISTORY HANDLERS ---
+      function saveBriefToHistory(brief) {
+        // Prevent duplicate IDs or duplicate names
+        sessionHistory = sessionHistory.filter(item => item.companyName !== brief.companyName);
+        sessionHistory.unshift(brief);
+        if (sessionHistory.length > 5) sessionHistory.pop(); // Cap at last 5
+        renderHistoryDropdown();
+      }
+
+      function renderHistoryDropdown() {
+        if (sessionHistory.length === 0) {
+          historyWrapper.classList.add("hidden");
+          return;
+        }
+        historyWrapper.classList.remove("hidden");
+        historyItemsList.innerHTML = "";
+
+        sessionHistory.forEach(brief => {
+          const itemBtn = document.createElement("button");
+          itemBtn.className = "w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-50 dark:hover:bg-neutral-800 transition text-xs flex flex-col gap-0.5 cursor-pointer border-0 bg-transparent";
+          itemBtn.innerHTML = `
+            <div class="flex justify-between items-center w-full">
+              <span class="font-bold text-gray-800 dark:text-neutral-200 truncate max-w-[160px]">${brief.companyName}</span>
+              <span class="text-[9px] text-gray-400 dark:text-neutral-500 font-mono">${brief.timestamp}</span>
+            </div>
+            <span class="text-[10px] text-gray-400 dark:text-neutral-500 truncate">${brief.type} &bull; ${brief.industry}</span>
+          `;
+          itemBtn.addEventListener("click", () => {
+            renderBriefToScreen(brief);
+            historyDropdown.classList.add("hidden");
+          });
+          historyItemsList.appendChild(itemBtn);
+        });
+      }
+
+      // Toggle history display view popover
+      historyToggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        historyDropdown.classList.toggle("hidden");
+      });
+      document.addEventListener("click", () => historyDropdown.classList.add("hidden"));
+      historyDropdown.addEventListener("click", (e) => e.stopPropagation());
+
+      // --- PRACTICE TIMING MECHANICS ---
+      function resetAndStartTimer() {
+        clearInterval(timerInterval);
+        timerSeconds = 0;
+        timerDisplay.innerText = "00:00:00";
+        timerRunning = true;
+        timerIconPlay.classList.add("hidden");
+        timerIconPause.classList.remove("hidden");
+        
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const hours = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+          const minutes = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+          const secs = String(timerSeconds % 60).padStart(2, '0');
+          timerDisplay.innerText = `${hours}:${minutes}:${secs}`;
+        }, 1000);
+      }
+
+      timerControlBtn.addEventListener("click", () => {
+        if (!timerRunning) {
+          // Play state resume
+          timerRunning = true;
+          timerIconPlay.classList.add("hidden");
+          timerIconPause.classList.remove("hidden");
+          timerInterval = setInterval(() => {
+            timerSeconds++;
+            const hours = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(timerSeconds % 60).padStart(2, '0');
+            timerDisplay.innerText = `${hours}:${minutes}:${secs}`;
+          }, 1000);
+          showToast("Practice stopwatch timer resumed.");
+        } else {
+          // Pause state execution
+          timerRunning = false;
+          timerIconPlay.classList.remove("hidden");
+          timerIconPause.classList.add("hidden");
+          clearInterval(timerInterval);
+          showToast("Practice stopwatch timer paused.");
+        }
+      });
+
+      // --- RENDERING VISUAL PRESENTATION ---
+      function renderBriefToScreen(brief) {
+        currentActiveBrief = brief;
+
+        briefMetaBadge.innerHTML = `${brief.type} &bull; ${brief.industry}`;
+        briefCompanyName.innerText = brief.companyName;
+        briefCompanyDesc.innerText = brief.companyDesc;
+        briefDeadline.innerText = brief.deadline;
+
+        // Build interactive requirement list checkboxes
+        briefJobDesc.innerHTML = "";
+        
+        // Context sentence introduction line
+        const introP = document.createElement("p");
+        introP.className = "mb-2 font-medium text-gray-800 dark:text-neutral-200";
+        introP.innerText = brief.companyDesc.split(".")[0] + ". Below are the mandatory items to implement:";
+        briefJobDesc.appendChild(introP);
+
+        // Core dynamic check list loop builder
+        brief.bullets.forEach((bulletText, idx) => {
+          const wrapper = document.createElement("label");
+          wrapper.className = "flex items-start gap-3 p-2.5 rounded-xl border border-gray-100 dark:border-neutral-800/60 bg-gray-50/50 dark:bg-neutral-950/30 hover:bg-gray-100/50 dark:hover:bg-neutral-800/30 transition cursor-pointer select-none text-sm leading-relaxed";
+          
+          wrapper.innerHTML = `
+            <input type="checkbox" id="chk_${idx}" class="mt-1 rounded-sm border-gray-300 dark:border-neutral-700 text-purple-600 focus:ring-purple-500 h-4 w-4 shrink-0 transition accent-purple-600">
+            <span class="text-gray-700 dark:text-neutral-300 transition-all duration-200 chk-text">${bulletText}</span>
+          `;
+
+          // Handle custom visual line-through toggle on click state triggers
+          const chkInput = wrapper.querySelector("input");
+          const chkTextSpan = wrapper.querySelector(".chk-text");
+          chkInput.addEventListener("change", () => {
+            if (chkInput.checked) {
+              chkTextSpan.classList.add("line-through", "opacity-40");
+            } else {
+              chkTextSpan.classList.remove("line-through", "opacity-40");
+            }
+          });
+
+          briefJobDesc.appendChild(wrapper);
+        });
+
+        // Add core deliverables block bottom node
+        const deliverableBox = document.createElement("div");
+        deliverableBox.className = "mt-4 p-3 bg-purple-500/5 border border-purple-500/10 rounded-xl";
+        deliverableBox.innerHTML = `
+          <h4 class="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1">Expected Final Assets Handoff</h4>
+          <p class="text-xs italic text-gray-600 dark:text-neutral-400">${brief.deliverables}</p>
+        `;
+        briefJobDesc.appendChild(deliverableBox);
+
+        // Build Interactive Copyable Palette Swatches
+        colorSwatchesContainer.innerHTML = "";
+        brief.colors.forEach(colorHex => {
+          const swatchBtn = document.createElement("button");
+          swatchBtn.type = "button";
+          swatchBtn.className = "group relative w-7 h-7 rounded-full border border-black/10 dark:border-white/10 block shadow-3xs cursor-pointer hover:scale-115 active:scale-95 transition-transform duration-200 focus:outline-hidden focus:ring-2 focus:ring-purple-500";
+          swatchBtn.style.backgroundColor = colorHex;
+          swatchBtn.title = `Copy ${colorHex} to clipboard`;
+
+          swatchBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(colorHex).then(() => {
+              showToast(`Copied color ${colorHex} to clipboard!`);
+            });
+          });
+
+          colorSwatchesContainer.appendChild(swatchBtn);
+        });
+
+        // Reveal view container framework
+        outputContainer.classList.remove("hidden");
+        
+        // Start track session practice timer clock framework reset
+        resetAndStartTimer();
+      }
+
+      // --- GENERATION ACTION INTERFACE TRIGGER ---
+      function triggerGeneration() {
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = `
+          <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Synthesizing Parameters...</span>
+        `;
+
+        setTimeout(() => {
+          const freshBrief = generateBrief(typeSelect.value, industrySelect.value, scopeSelect.value);
+          renderBriefToScreen(freshBrief);
+          saveBriefToHistory(freshBrief);
+
+          // Restore normal state configuration variables
+          generateBtn.disabled = false;
+          generateBtn.innerHTML = `
+            <span>Generate Practice Brief</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          `;
+
+          outputContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 400);
+      }
+
+      generateBtn.addEventListener("click", triggerGeneration);
+      actionRegenerate.addEventListener("click", triggerGeneration);
+
+      // --- EXPORT OPTION: RAW SPEC TEXT COPIES ---
+      actionCopy.addEventListener("click", () => {
+        if (!currentActiveBrief) return;
+
+        const bulletLines = currentActiveBrief.bullets.map(b => `- [ ] ${b}`).join("\n");
+        const specClipboardText = 
+          `GoodBrief Creative Challenge Specifications\n` +
+          `===========================================\n` +
+          `Company Identity: ${currentActiveBrief.companyName}\n` +
+          `Industry Focus: ${currentActiveBrief.industry} (${currentActiveBrief.type} Request)\n\n` +
+          `1. Company Background Context:\n${currentActiveBrief.companyDesc}\n\n` +
+          `2. Concrete Task Requirements:\n${bulletLines}\n\n` +
+          `3. Final Expected Handoff:\n${currentActiveBrief.deliverables}\n\n` +
+          `4. Expected Constraints:\nTimeline: ${currentActiveBrief.deadline}\n` +
+          `Suggested Palette Swatches: ${currentActiveBrief.colors.join(", ")}\n\n` +
+          `Practice Tracking clock recorded duration: ${timerDisplay.innerText}\n` +
+          `Generated via Enhanced GoodBrief Engine.`;
+
+        navigator.clipboard.writeText(specClipboardText).then(() => {
+          const copyBtnSpan = document.getElementById("copy-btn-text");
+          copyBtnSpan.innerText = "Brief Copied Perfectly!";
+          actionCopy.classList.add("bg-emerald-500", "text-white", "dark:bg-emerald-600");
+
+          setTimeout(() => {
+            copyBtnSpan.innerText = "Copy Specification";
+            actionCopy.classList.remove("bg-emerald-500", "text-white", "dark:bg-emerald-600");
+          }, 2000);
+
+          showToast("Full client spec layout copied with markup symbols successfully.");
+        });
+      });
+
+      // --- EXPORT OPTION: PDF INVOICES VIA DIRECT ACCESSIBLE LAYOUTS ---
+      actionPdf.addEventListener("click", () => {
+        if (!currentActiveBrief) return;
+
+        try {
+          const { jsPDF } = window.jspdf;
+          const pdfDoc = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
+          const horizontalMargin = 45;
+          let calculatedY = 55;
+
+          // Header Title Identity block markers
+          pdfDoc.setFont("Helvetica", "bold");
+          pdfDoc.setFontSize(22);
+          pdfDoc.setTextColor(99, 102, 241); // Indigo Primary Hex Accent color
+          pdfDoc.text("Good Brief Spec Sheet", horizontalMargin, calculatedY);
+          
+          pdfDoc.setFont("Helvetica", "normal");
+          pdfDoc.setFontSize(9);
+          pdfDoc.setTextColor(140, 140, 140);
+          pdfDoc.text(`Track Session Timer: ${timerDisplay.innerText}`, 430, calculatedY - 3);
+          calculatedY += 16;
+
+          pdfDoc.setDrawColor(230, 230, 230);
+          pdfDoc.line(horizontalMargin, calculatedY, 550, calculatedY);
+          calculatedY += 30;
+
+          // Context configuration identifiers lines
+          pdfDoc.setFont("Helvetica", "bold");
+          pdfDoc.setFontSize(10);
+          pdfDoc.setTextColor(140, 90, 230);
+          pdfDoc.text(`DISCIPlINE: ${currentActiveBrief.type.toUpperCase()}  |  MARKET: ${currentActiveBrief.industry.toUpperCase()}`, horizontalMargin, calculatedY);
+          calculatedY += 24;
+
+          // Target Client Title block parameters
+          pdfDoc.setFont("Helvetica", "bold");
+          pdfDoc.setFontSize(18);
+          pdfDoc.setTextColor(20, 25, 40);
+          pdfDoc.text(currentActiveBrief.companyName, horizontalMargin, calculatedY);
+          calculatedY += 24;
+
+          // Description sub blocks parsing
+          pdfDoc.setFont("Helvetica", "bold");
+          pdfDoc.setFontSize(9);
+          pdfDoc.setTextColor(160, 160, 160);
+          pdfDoc.text("CLIENT SUMMARY BACKGROUND PROFILE", horizontalMargin, calculatedY);
+          calculatedY += 14;
+
+          pdfDoc.setFont("Helvetica", "normal");
+          pdfDoc.setFontSize(10.5);
+          pdfDoc.setTextColor(60, 60, 60);
+          let descriptionLinesSplit = pdfDoc.splitTextToSize(currentActiveBrief.companyDesc, 500);
+          pdfDoc.text(descriptionLinesSplit, horizontalMargin, calculatedY);
+          calculatedY += (descriptionLinesSplit.length * 15) + 25;
+
+          // Bullet points array requirements loops processing blocks parsing
+          pdfDoc.setFont("Helvetica", "bold");
+          pdfDoc.setFontSize(9);
+          pdfDoc.setTextColor(160, 160, 160);
+          pdfDoc.text("CRITICAL IMPLEMENTATION WORKFLOW TASKS", horizontalMargin, calculatedY);
+          calculatedY += 16;
+
+          pdfDoc.setFont("Helvetica", "normal");
+          currentActiveBrief.bullets.forEach(bLine => {
+            let wrappedTextSplit = pdfDoc.splitTextToSize(`[ ]  ${bLine}`, 490);
+            
+            // Check cross boundary page breaks parameters
+            if (calculatedY + (wrappedTextSplit.length * 15) > 780) {
+              pdfDoc.addPage();
+              calculatedY = 55;
+            }
+
+            pdfDoc.text(wrappedTextSplit, horizontalMargin + 10, calculatedY);
+            calculatedY += (wrappedTextSplit.length * 15) + 5;
+          });
+
+          calculatedY += 15;
+          // Final Delivery block segment outputs
+          if (calculatedY + 80 > 780) {
+            pdfDoc.addPage();
+            calculatedY = 55;
+          }
+
+          pdfDoc.setDrawColor(240, 240, 240);
+          pdfDoc.line(horizontalMargin, calculatedY, 550, calculatedY);
+          calculatedY += 20;
+
+          pdfDoc.setFont("Helvetica", "bold");
+          pdfDoc.setFontSize(9);
+          pdfDoc.setTextColor(150, 150, 150);
+          pdfDoc.text("DELIVERY WINDOW CONSTRAINTS", horizontalMargin, calculatedY);
+          pdfDoc.text("SUGGESTED PANTONE PALETTE TONES", 340, calculatedY);
+          calculatedY += 14;
+
+          pdfDoc.setFont("Helvetica", "bold");
+          pdfDoc.setFontSize(10);
+          pdfDoc.setTextColor(30, 30, 30);
+          pdfDoc.text(currentActiveBrief.deadline, horizontalMargin, calculatedY);
+          
+          pdfDoc.setFont("Helvetica", "normal");
+          pdfDoc.text(currentActiveBrief.colors.join(" , "), 340, calculatedY);
+
+          pdfDoc.save(`GoodBrief_Spec_${currentActiveBrief.companyName.replace(/\s+/g, '_')}.pdf`);
+          showToast("PDF document download compiled seamlessly.");
+        } catch(err) {
+          console.error(err);
+          showToast("PDF generation conflict occurred.");
+        }
+      });
+
+      // --- EXPORT OPTION: RENDER HD CARD CAPTURE IMAGES ---
+      actionImage.addEventListener("click", () => {
+        if (!currentActiveBrief) return;
+
+        const card = document.getElementById("brief-card");
+        const spinner = document.getElementById("image-btn-spinner");
+        const icon = document.getElementById("image-btn-icon");
+        const textSpan = document.getElementById("image-btn-text");
+
+        actionImage.disabled = true;
+        spinner.classList.remove("hidden");
+        icon.classList.add("hidden");
+        textSpan.innerText = "Rendering Card Matrix...";
+
+        setTimeout(() => {
+          const isDarkActive = document.documentElement.classList.contains("dark");
+          
+          html2canvas(card, {
+            scale: 2, // Double dimension pixel clarity
+            backgroundColor: isDarkActive ? "#121212" : "#FFFFFF",
+            useCORS: true,
+            logging: false,
+            windowWidth: card.scrollWidth,
+            windowHeight: card.scrollHeight
+          }).then(canvasImage => {
+            const downloadTrigger = document.createElement("a");
+            downloadTrigger.download = `GoodBrief_Layout_${currentActiveBrief.companyName.replace(/\s+/g, '_')}.png`;
+            downloadTrigger.href = canvasImage.toDataURL("image/png");
+            downloadTrigger.click();
+
+            actionImage.disabled = false;
+            spinner.classList.add("hidden");
+            icon.classList.remove("hidden");
+            textSpan.innerText = "Export Image";
+            showToast("PNG canvas brief card downloaded.");
+          }).catch(err => {
+            console.error(err);
+            actionImage.disabled = false;
+            spinner.classList.add("hidden");
+            icon.classList.remove("hidden");
+            textSpan.innerText = "Export Image";
+            showToast("Failed to snap snapshot layers.");
+          });
+        }, 300);
+      });
+
+      // --- NEWSLETTER FORM ACTION CONTROLLER ---
+      newsletterForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const inputString = newsletterEmail.value.trim();
+
+        if (!inputString || !inputString.includes("@")) {
+          showToast("Invalid format. Please use a proper email.");
+          return;
+        }
+
+        showToast("Success! You've joined the GoodBrief mock practice stream.");
+        newsletterEmail.value = "";
+      });
+
+    });
+  </script>
+</body>
+</html>
